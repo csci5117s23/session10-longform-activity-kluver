@@ -119,3 +119,45 @@ h1,h2,h3,h4,h5,h6 {
         height: 250px;
     }
 }
+
+
+.pen_card {
+    text-align: center;
+}
+.pen_card a {
+    display: block;
+    margin:0.2em;
+    height: calc(100% - 0.4em);
+    border-radius: 0.5em;
+    background-color: lightcoral;
+    color:black;
+    text-decoration: none;
+    font-weight: bold;
+}
+.pen_card a img {
+    width: 90%;
+    margin: 5%;
+}
+
+article.pen img {
+    width: 80%;
+    margin-left:10%;
+}
+article {
+    padding: 1em;
+}
+
+.purefix-stretch {
+    align-items: stretch;
+}
+.pen_like_1 {
+    display: inline-block;
+    padding:0.3em;
+    border:1px solid black;
+    color:black;
+    cursor:pointer;    
+}
+.pen_like_1 img {
+    height:1em;
+    width:1em !important;
+}

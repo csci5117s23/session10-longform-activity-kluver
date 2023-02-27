@@ -1,0 +1,34 @@
+{% extends "parent.html" %}
+{% block title %} pens {% endblock %}
+{% block body %} 
+<article class="pen">
+   <h1>{{pen.name}}</h1>
+   <a href="{{pen.link}}">Review by unsharpen</a> (used without permission under fair use -- academic purposes. Please don't tell them.)
+   Reviewed: {{pen.date}}
+
+   <div class="pen_like_0">
+      {% if you_like %}
+      <form method="POST" action="/pen/{{pen.id}}/unlike0">
+         likes0: <input type="submit" value="{{likes}}"  style="background:green" >
+      </form>
+      {% else %}
+      <form method="POST" action="/pen/{{pen.id}}/like0">
+         likes0: <input type="submit" value="{{likes}}"  >
+      </form>
+      {% endif %}
+   </div>
+   Like1: <div class="pen_like_1" data-id="{{pen.id}}"></div>
+   <img src="{{pen.image}}">
+   <p style="white-space: pre-wrap">{{pen.text}}</p>
+   <table class="pure-table pure-table-striped">
+      <tbody>
+      {% for key in ["pen_type", "nib_sizes", "capped_retractable", "barrel_material", "length_uncapped_cm", "similar_to", "street_price", "clip", "grip_material", "grip_diameter_mm", "writing_sizes", "country_of_origin", "manufacturer", "refills", "barrel_color", "still_sold", "weight_g", "length_capped_retracted_cm", "grip_color", "refillable", "length_posted_cm", "nib_color", "rating", "body_diameter_mm", "ink_color_shipped", "nib_material", "release_year", "msrp"] %}
+      <tr>
+         <td> {{key | replace("_", " ") | title}}</td>
+         <td> {{pen[key]}}</td>
+      </tr>
+      {% endfor %}
+   </tbody>
+   </table>
+</article>
+{% endblock %}

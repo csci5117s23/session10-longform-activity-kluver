@@ -65,7 +65,7 @@ def logout():
 def login_required(f):
     @wraps(f)
     def decorated_function(*args, **kwargs):
-        if g.user is None:
+        if session.get('user') is None:
             return redirect(url_for('login', next=request.url))
         return f(*args, **kwargs)
     return decorated_function
@@ -82,8 +82,67 @@ def home():
 def info():
     return render_template("info.html")
 
-@login_required
 @app.route("/reset")
+@login_required
 def reset():
     db.reset_logins()
     return redirect("/")
+
+
+
+@app.route("/pen")
+def pen_index():
+    page = int(request.args.get("page", 1))-1
+    return render_template("pens.html", pens=db.get_pens(page=page))
+
+@app.route("/pen/<int:pen_id>")
+def get_pen(pen_id):
+    pen = db.get_pen(pen_id)
+    if pen:
+        pen = dict(pen)
+        pen['link'] = 'https://unsharpen.com/?s='+quote_plus(pen['name'])
+        if ('user' in session):
+            return render_template("pen.html", pen=pen, likes= db.get_likes(pen_id), you_like= db.get_does_like(pen_id, session['uid']))
+        else:
+            return render_template("pen.html", pen=pen, likes= db.get_likes(pen_id), you_like= False)
+    else:
+        abort(404)
+
+
+### API note -- this isn't the most RESTFUL API I could immagine, but it'll serve.
+@app.route("/pen/<int:pen_id>/like",methods=["GET"])
+def get_pen_likes(pen_id):
+    if ('user' in session):
+        return jsonify({'likes': db.get_likes(pen_id), 'you_like': db.get_does_like(pen_id, session['uid'])})
+    else:
+        return jsonify({'likes': db.get_likes(pen_id),'you_like':False})
+        
+
+#LIKE 1
+
+@app.route("/pen/<int:pen_id>/like0",methods=["POST"])
+@login_required
+def like_pen0(pen_id):
+    db.like_pen(pen_id, session['uid'])
+    return redirect(url_for('get_pen', pen_id=pen_id))
+
+@app.route("/pen/<int:pen_id>/unlike0",methods=["POST"])
+@login_required
+def unlike_pen0(pen_id):
+    db.unlike_pen(pen_id, session['uid'])
+    return redirect(url_for('get_pen', pen_id=pen_id))
+
+
+@app.route("/pen/<int:pen_id>/like1",methods=["POST"])
+@login_required
+def like_pen(pen_id):
+    db.like_pen(pen_id, session['uid'])
+    return jsonify({'likes': db.get_likes(pen_id), 'you_like': True})
+
+@app.route("/pen/<int:pen_id>/like1",methods=["DELETE"])
+@login_required
+def unlike_pen(pen_id):
+    db.unlike_pen(pen_id, session['uid'])
+    return jsonify({'likes': db.get_likes(pen_id), 'you_like': False})
+        
+

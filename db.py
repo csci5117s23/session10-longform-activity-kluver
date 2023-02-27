@@ -56,3 +56,43 @@ def has_logged_in_before(userId):
         else:
             return True
 
+
+def get_pens(page, per_page=15):
+    """
+    page is 0 indexed.
+    """
+    with get_db_cursor(False) as cur:
+        cur.execute("select id, name, image from pens limit %s offset %s", (per_page, per_page*page))
+        return cur.fetchall()
+
+def get_pen(pen_id):
+    with get_db_cursor(False) as cur:
+        cur.execute("select * from pens where id = %s", (pen_id,))
+        return cur.fetchone()
+
+def get_likes(pen_id):
+    ### NOTE -- this really should be a join that's properly integrated into the two above functions
+    ### But I didn't want to break out the complex SQL for an example like this.
+    #### Just note this is inefficient.
+    with get_db_cursor(False) as cur:
+        cur.execute("select count(*) from pen_likes where pen_id = %s", (pen_id,))
+        counts = cur.fetchone()
+        return counts[0]
+
+def get_does_like(pen_id, user_id):
+    with get_db_cursor(False) as cur:
+        ### Again -- this should really be done with the above in one request. terrible form that it isn't.
+        cur.execute("select count(*) from pen_likes where pen_id = %s and user_id=%s", (pen_id,user_id))
+        counts = cur.fetchone()
+        return counts[0]!=0
+
+def like_pen(pen_id, user_id):
+    with get_db_cursor(True) as cur:
+        cur.execute("""insert into pen_likes (user_id, pen_id) values (%s, %s) 
+                       on conflict do nothing""" , (user_id, pen_id,))
+
+
+def unlike_pen(pen_id, user_id):
+    with get_db_cursor(True) as cur:
+        cur.execute("""delete from pen_likes where user_id = %s and pen_id=%s""" , (user_id, pen_id,))
+
