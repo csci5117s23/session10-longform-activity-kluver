@@ -7,6 +7,14 @@
     {% endif %}
     {{request.args.get('page',1)}}
     <a href="/pen?page={{(request.args.get('page',1) | int) +1}}">next</a>
+    search (like)
+    <form action="/pen/search_like" method="GET">
+        <input type="search" name="q">
+    </form>
+    search (full)
+    <form action="/pen/search_full" method="GET">
+        <input type="search" name="q">
+    </form>
 </div>
 
 <div class="pure-g purefix-stretch">

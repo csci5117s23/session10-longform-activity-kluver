@@ -96,3 +96,33 @@ def unlike_pen(pen_id, user_id):
     with get_db_cursor(True) as cur:
         cur.execute("""delete from pen_likes where user_id = %s and pen_id=%s""" , (user_id, pen_id,))
 
+
+
+
+def search_pens_like(term, page, per_page=15):
+    """
+    page is 0 indexed.
+    """
+    with get_db_cursor(False) as cur:
+        term = "%"+term+"%"
+        term.replace(" ", "%")
+        # % is the wildcard for like.
+        cur.execute("select id, name, image from pens where text like %s limit %s offset %s", (term, per_page, per_page*page))
+        return cur.fetchall()
+
+
+
+def search_pens(term, page, per_page=15):
+    """
+    page is 0 indexed.
+    """
+    with get_db_cursor(False) as cur:
+        # The where uses the full text search algorithm to match 
+        # the order likewise uses full text search to match
+        cur.execute("""select id, name, image 
+                       from pens 
+                       where to_tsvector('english', text) @@ plainto_tsquery('english', %s) 
+                       order by ts_rank(to_tsvector('english', text), plainto_tsquery('english', %s)) desc 
+                       limit %s offset %s""", 
+                       (term, term, per_page, per_page*page))
+        return cur.fetchall()

@@ -95,6 +95,20 @@ def pen_index():
     page = int(request.args.get("page", 1))-1
     return render_template("pens.html", pens=db.get_pens(page=page))
 
+@app.route("/pen/search_like")
+def pen_index_search1():
+    page = int(request.args.get("page", 1))-1
+    term = request.args.get("q","")
+    return render_template("pens.html", pens=db.search_pens_like(term, page=page))
+
+@app.route("/pen/search_full")
+def pen_index_search2():
+    page = int(request.args.get("page", 1))-1
+    term = request.args.get("q","")
+    return render_template("pens.html", pens=db.search_pens(term, page=page))
+
+
+
 @app.route("/pen/<int:pen_id>")
 def get_pen(pen_id):
     pen = db.get_pen(pen_id)
